@@ -1,0 +1,11 @@
+---
+title: "p8105_hw2_yr2560"
+author: "Yiman Rui"
+date: "2026-10-06"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+

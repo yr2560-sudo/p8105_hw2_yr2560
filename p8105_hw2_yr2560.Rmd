@@ -9,3 +9,39 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Problem 1
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+Read and clean the data; retain line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (case_match function may be useful).
+```{r}
+transit = read_csv("~/Desktop/Data Science/Data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") |>
+  janitor::clean_names() |>
+  select(
+    line,
+    station_name,
+    station_latitude,
+    station_longitude,
+    route1:route11,
+    entry,
+    vending,
+    entrance_type,
+    ada
+  ) |>
+  mutate(
+    entry = case_match(
+      entry,
+      "YES" ~ TRUE,
+      "NO" ~ FALSE
+    )
+  )
+
+transit
+  
+```
+The cleaned dataset contains 1,868 rows and 19 columns. Each row represents a subway station entrance or exit. The variables include the subway line and station name, station latitude and longitude, the routes served by the station, whether entry is allowed, whether a vending machine is present, entrance type, and ADA compliance.
+
+I cleaned the variable names, selected only the requested variables, and converted entry to TRUE and FALSE. At this point, the data are not completely tidy because route information is spread across route1 through route11, so route number is stored in the column names rather than in its own variable.
+

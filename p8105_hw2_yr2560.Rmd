@@ -101,3 +101,65 @@ transit_reformat |>
   nrow()
 ```
 There are 60 stations that serve A and there are 17 of them are ADA compliant. 
+
+## Problem 2
+
+Mr.Trash Wheel
+```{r}
+mr_trash = read_excel("~/Desktop/Data Science/Data/202610 Trash Wheel Collection Data.xlsx",
+    sheet = "Mr. Trash Wheel",
+    range = "A2:N742",
+    na = c("", "NA", "N/A", "-")
+  ) |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(
+    year = as.integer(year),
+    plastic_bottles = as.numeric(plastic_bottles),
+    sports_balls = as.integer(round(sports_balls)),
+    trash_wheel = "Mr. Trash Wheel"
+  )
+```
+
+Prof Trash Wheel
+```{r}
+prof_trash = read_excel("~/Desktop/Data Science/Data/202610 Trash Wheel Collection Data.xlsx",
+    sheet = "Professor Trash Wheel",
+    range = "A2:M139",
+    na = c("", "NA", "N/A", "-", "dive")
+  ) |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(
+    year = as.integer(year),
+    plastic_bottles = as.numeric(plastic_bottles),
+    trash_wheel = "Professor Trash Wheel"
+  )
+```
+
+Gwynnda
+```{r}
+gwynnda_trash = read_excel("~/Desktop/Data Science/Data/202610 Trash Wheel Collection Data.xlsx",
+    sheet = "Gwynnda the Good Wheel of the W",
+    range = "A2:L394",
+    na = c("", "NA", "N/A", "-")
+  ) |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(
+    year = as.integer(year),
+    plastic_bottles = as.numeric(plastic_bottles),
+    trash_wheel =  "Gwynnda"
+  )
+
+```
+
+Combine 3 dataset
+```{r}
+trash_wheel = 
+  bind_rows(mr_trash, prof_trash, gwynnda_trash) |>
+  relocate(trash_wheel)
+```
+
+The combined Trash Wheel dataset contains 1,269 observations. Each observation corresponds to one dumpster collection. Important variables include the Trash Wheel name, dumpster number, month and year, date, trash weight in tons, volume in cubic yards, and counts of several types of trash such as plastic bottles and cigarette butts.
+

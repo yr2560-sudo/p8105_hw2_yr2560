@@ -163,3 +163,31 @@ trash_wheel =
 
 The combined Trash Wheel dataset contains 1,269 observations. Each observation corresponds to one dumpster collection. Important variables include the Trash Wheel name, dumpster number, month and year, date, trash weight in tons, volume in cubic yards, and counts of several types of trash such as plastic bottles and cigarette butts.
 
+Professor trash wheel total weights
+```{r}
+prof_trash |>
+  summarize(
+    total_weight = sum(weight_tons, na.rm = TRUE)
+  ) |>
+  pull(total_weight)
+```
+
+The total weight of trash colelcted is 294.96 tons.
+
+Gwynnda cigarette butts in June 2022
+```{r}
+gwynnda_trash |>
+  filter(
+    year == 2022,
+    month == "June"
+  ) |>
+  summarize(
+    total_cigarettes = sum(cigarette_butts, na.rm = TRUE)
+  ) |>
+  pull(total_cigarettes)
+```
+Gwynnda collected 18120 cigarette butts in June 2022.
+
+
+
+

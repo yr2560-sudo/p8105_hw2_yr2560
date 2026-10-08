@@ -189,6 +189,8 @@ gwynnda_trash |>
 Gwynnda collected 18120 cigarette butts in June 2022.
 
 ## Problem 3
+
+MCI Baseline data
 ```{r}
 mci_base = 
   read_csv("~/Desktop/Data Science/Data/MCI_baseline.csv",
@@ -244,4 +246,93 @@ mean_base_age
 prop_women_apoe4
 ```
 After applying the inclusion criterion, the baseline dataset contains 479 participants. Of these participants, 93 developed MCI during follow-up. The average baseline age was 65 years. Among women in the study, 30% were APOE4 carriers.
+
+MCI Amyloid data
+```{r}
+mci_amyloid =
+  read_csv(
+    "~/Desktop/Data Science/Data/mci_amyloid.csv",
+    skip = 1,
+    na = c(".", "NA")
+  ) |>
+  janitor::clean_names() |>
+  rename(id = study_id) |>
+  pivot_longer(
+    baseline:time_8,
+    names_to = "visit",
+    values_to = "amyloid_42_40"
+  ) |>
+  mutate(
+    time = case_match(
+      visit,
+      "baseline" ~ 0,
+      "time_2" ~ 2,
+      "time_4" ~ 4,
+      "time_6" ~ 6,
+      "time_8" ~ 8
+    )
+  ) |>
+  select(
+    id,
+    time,
+    amyloid_42_40
+  )
+
+mci_amyloid
+```
+The resulting dataset contains one row for each participant at each study visit. The time variable indicates the number of years since baseline, while amyloid_42_40 contains the amyloid beta 42/40 ratio.
+
+Participants only in one dataset
+```{r}
+base_only = anti_join(
+    mci_base,
+    mci_amyloid |>
+      distinct(id),
+    by = "id"
+  )
+base_only
+
+amyloid_only =
+  anti_join(
+    mci_amyloid |>
+      distinct(id),
+    mci_base,
+    by = "id"
+  )
+amyloid_only
+
+nrow(base_only)
+nrow(amyloid_only)
+
+```
+There are r 8 eligible participants who appear only in the baseline dataset and 16 participant IDs that appear only in the amyloid dataset. The amyloid-only group includes the four participants who were removed from the baseline dataset because they already had MCI at baseline, as well as other participants for whom baseline demographic information is not available. Therefore, the participant lists in the two source datasets are not identical.
+
+Combine two dataset
+```{r}
+mci_combined = inner_join(
+    mci_base,
+    mci_amyloid,
+    by = "id"
+  )
+
+n_participants =
+  mci_combined |>
+  distinct(id) |>
+  nrow()
+
+dim(mci_combined)
+
+n_participants
+```
+The combined dataset contains 2355 rows and 8 columns, representing 471 unique participants.
+
+Each participant can contribute up to five biomarker observations corresponding to baseline and years 2, 4, 6, and 8. The final dataset contains participant demographic information, APOE4 carrier status, age at MCI onset when applicable, follow-up time, and amyloid beta 42/40 ratio.
+
+Export final data in csv
+```{r}
+write_csv(
+  mci_combined,
+  "~/Desktop/Data Science/Data/mci_combined.csv"
+)
+```
 
